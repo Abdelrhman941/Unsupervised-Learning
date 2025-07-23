@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Component Analysis (PCA) Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #5b86e5 0%, #36d1dc 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #5b86e5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+        
+        .highlight-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+        
+        .concept-box {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+            color: #0d47a1;
+        }
+        
+        .advantages-box {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+            color: #1b5e20;
+        }
+        
+        .limitations-box {
+            background: #fce4ec;
+            border-left-color: #e91e63;
+            color: #880e4f;
+        }
+        
+        .math-box {
+            background: linear-gradient(135deg, #5b86e5, #36d1dc);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .use-case {
+            background: #f0f4f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #5b86e5;
+        }
+        
+        .algorithm-steps {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        ol li, ul li {
+            margin-bottom: 8px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .gradient-divider {
+            height: 5px;
+            background: linear-gradient(to right, #5b86e5, #36d1dc);
+            margin: 30px 0;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 30px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Principal Component Analysis (PCA)</h1>
+            <p>A Comprehensive Guide to Dimensionality Reduction with PCA</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>🎯 What is PCA?</h2>
+                <div class="concept-box highlight-box">
+                    <p>Principal Component Analysis (PCA) is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components.</p>
+                    <br>
+                    <p>PCA is a technique that transforms high-dimensional data into lower dimensions while preserving as much information as possible. It does this by:</p>
+                    <ol>
+                        <li>Finding directions (principal components) in which the data varies the most</li>
+                        <li>Projecting the data onto these directions</li>
+                        <li>Keeping only the directions with the most variance</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>🧮 Mathematical Foundation</h2>
+                <div class="math-box">
+                    <h3>The Core Mathematics Behind PCA</h3>
+                </div>
+                
+                <p>PCA is based on the eigendecomposition of the covariance matrix of the data. Let's understand it step by step:</p>
+                
+                <div class="algorithm-steps">
+                    <ol>
+                        <li>Start with a dataset X with n samples and d features</li>
+                        <li>Center the data by subtracting the mean of each feature</li>
+                        <li>Compute the covariance matrix: Σ = (1/n) X<sup>T</sup> X</li>
+                        <li>Find the eigenvalues and eigenvectors of Σ</li>
+                        <li>The eigenvectors are the principal components</li>
+                        <li>The corresponding eigenvalues represent the amount of variance explained by each component</li>
+                    </ol>
+                </div>
+                
+                <div class="math-formula">
+                    Covariance Matrix: Σ = (1/n) X<sup>T</sup> X<br>
+                    Eigendecomposition: Σv = λv<br>
+                    Where v is an eigenvector and λ is the corresponding eigenvalue
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>🔧 Algorithm Steps</h2>
+                <div class="algorithm-steps">
+                    <h3>Implementation Steps for PCA</h3>
+                    <ol>
+                        <li><strong>Standardization:</strong> Standardize the dataset (optional but recommended)</li>
+                        <li><strong>Covariance Matrix Calculation:</strong> Calculate the covariance matrix</li>
+                        <li><strong>Eigenvalue Decomposition:</strong> Compute eigenvalues and eigenvectors of the covariance matrix</li>
+                        <li><strong>Sorting:</strong> Sort the eigenvalues in decreasing order and arrange eigenvectors accordingly</li>
+                        <li><strong>Feature Vector:</strong> Select k eigenvectors that correspond to the k largest eigenvalues</li>
+                        <li><strong>Transformation:</strong> Transform the original dataset using the feature vector</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="gradient-divider"></div>
+            
+            <div class="section">
+                <h2>📊 Explained Variance</h2>
+                <p>A critical concept in PCA is explained variance, which tells us how much information (variance) can be attributed to each principal component:</p>
+                <div class="two-column">
+                    <div class="card">
+                        <h3>Eigenvalues & Variance</h3>
+                        <p>Each principal component has an associated eigenvalue, which directly corresponds to the amount of variance it explains.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Explained Variance Ratio</h3>
+                        <p>The explained variance ratio is the ratio of each eigenvalue to the sum of all eigenvalues. This ratio helps in deciding how many components to keep.</p>
+                    </div>
+                </div>
+                <div class="math-formula">
+                    Explained Variance Ratio = λ<sub>i</sub> / Σλ<sub>j</sub>
+                    <br><br>
+                    Where λ<sub>i</sub> is the eigenvalue for the i-th principal component
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>✅ Advantages of PCA</h2>
+                <div class="advantages-box highlight-box">
+                    <ul>
+                        <li><strong>Dimensionality Reduction:</strong> Reduces the number of features while preserving most of the information</li>
+                        <li><strong>Noise Reduction:</strong> Can help filter out noise in the data</li>
+                        <li><strong>Visualization:</strong> Makes it possible to visualize high-dimensional data in 2D or 3D</li>
+                        <li><strong>Multicollinearity:</strong> Removes multicollinearity by creating uncorrelated components</li>
+                        <li><strong>Computational Efficiency:</strong> Can speed up machine learning algorithms by reducing dimensions</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>❌ Limitations of PCA</h2>
+                <div class="limitations-box highlight-box">
+                    <ul>
+                        <li><strong>Linear Assumptions:</strong> PCA assumes linear relationships in the data</li>
+                        <li><strong>Interpretability:</strong> Principal components may be hard to interpret</li>
+                        <li><strong>Sensitive to Scaling:</strong> Results are sensitive to feature scaling</li>
+                        <li><strong>May Lose Information:</strong> Some potentially important information may be discarded</li>
+                        <li><strong>Not Suitable for All Data:</strong> Not ideal for data with non-linear relationships</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>🚀 When to Use PCA</h2>
+                <div class="two-column">
+                    <div class="use-case">
+                        <h3>High-Dimensional Data</h3>
+                        <p>When dealing with datasets with many features</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Multicollinearity</h3>
+                        <p>When features are highly correlated</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Data Visualization</h3>
+                        <p>For visualizing high-dimensional data</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Noise Reduction</h3>
+                        <p>To remove noise from data</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Preprocessing</h3>
+                        <p>As a preprocessing step before applying other algorithms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

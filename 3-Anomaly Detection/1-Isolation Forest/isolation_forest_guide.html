@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isolation Forest Algorithm Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #43a047 0%, #1de9b6 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #43a047;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+        
+        .highlight-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+        
+        .concept-box {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+            color: #0d47a1;
+        }
+        
+        .advantages-box {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+            color: #1b5e20;
+        }
+        
+        .limitations-box {
+            background: #fce4ec;
+            border-left-color: #e91e63;
+            color: #880e4f;
+        }
+        
+        .parameters-box {
+            background: #f1f8e9;
+            border-left-color: #8bc34a;
+            color: #33691e;
+        }
+        
+        .math-box {
+            background: linear-gradient(135deg, #43a047, #1de9b6);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .use-case {
+            background: #f0f4f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #43a047;
+        }
+        
+        .algorithm-steps {
+            background: #e0f7fa;
+            border-left: 4px solid #00bcd4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        ol li, ul li {
+            margin-bottom: 8px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .application-card {
+            background: #f1f8e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid #43a047;
+        }
+
+        .gradient-divider {
+            height: 5px;
+            background: linear-gradient(to right, #43a047, #1de9b6);
+            margin: 30px 0;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 30px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌲 Isolation Forest for Anomaly Detection</h1>
+            <p>An Efficient Algorithm for Identifying Outliers</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>🎯 What is Isolation Forest?</h2>
+                <div class="concept-box highlight-box">
+                    <p>Isolation Forest is a tree-based algorithm specifically designed for anomaly detection. Unlike many other anomaly detection techniques that identify anomalies based on density or distance measures, Isolation Forest explicitly isolates anomalies by:</p>
+                    <ol>
+                        <li>Randomly selecting a feature</li>
+                        <li>Randomly selecting a split value between the maximum and minimum values of that feature</li>
+                        <li>Creating a recursive partitioning based on the above</li>
+                        <li>Building multiple isolation trees to form a forest</li>
+                    </ol>
+                    <br>
+                    <p>The key insight: <strong>Anomalies require fewer random partitions to be isolated compared to normal points.</strong></p>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>⚙️ How Isolation Forest Works</h2>
+                <p>The algorithm works in two main phases:</p>
+                
+                <div class="two-column">
+                    <div class="algorithm-steps">
+                        <h3>Training Phase</h3>
+                        <ol>
+                            <li>Create an ensemble of isolation trees (i.e., an isolation forest)</li>
+                            <li>For each tree:
+                                <ul>
+                                    <li>Randomly select a subset of data</li>
+                                    <li>Recursively partition the data by randomly selecting a feature and a split point</li>
+                                    <li>Continue until all instances are isolated or a specified tree height is reached</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="algorithm-steps">
+                        <h3>Evaluation Phase</h3>
+                        <ol>
+                            <li>Pass each data point through all trees in the forest</li>
+                            <li>Calculate the average path length (number of edges traversed) for each point</li>
+                            <li>Convert path lengths to anomaly scores</li>
+                            <li>Identify points with short path lengths (low scores) as anomalies</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>🧮 Mathematical Foundation</h2>
+                <div class="math-box">
+                    <h3>Anomaly Score Calculation</h3>
+                </div>
+                
+                <p>The anomaly score s(x,n) for an instance x is defined as:</p>
+                
+                <div class="math-formula">
+                    s(x,n) = 2<sup>(-E[h(x)]/c(n))</sup>
+                </div>
+                
+                <p>Where:</p>
+                <ul>
+                    <li>E[h(x)] is the average path length for instance x across all trees</li>
+                    <li>c(n) is the average path length of unsuccessful search in a Binary Search Tree</li>
+                    <li>c(n) = 2H(n-1) - (2(n-1)/n), where H(i) is the harmonic number</li>
+                </ul>
+                
+                <h3>Score Interpretation:</h3>
+                <div class="two-column">
+                    <div class="card">
+                        <p><strong>Score close to 1:</strong> High probability of being an anomaly</p>
+                    </div>
+                    <div class="card">
+                        <p><strong>Score much less than 0.5:</strong> Likely normal instance</p>
+                    </div>
+                    <div class="card">
+                        <p><strong>Score around 0.5:</strong> Hard to categorize</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+
+            <div class="section">
+                <h2>🔧 Key Parameters</h2>
+                <div class="parameters-box highlight-box">
+                    <ol>
+                        <li><strong>n_estimators:</strong> Number of isolation trees in the forest</li>
+                        <li><strong>max_samples:</strong> Number of samples to draw for each tree</li>
+                        <li><strong>contamination:</strong> Expected proportion of anomalies in the dataset</li>
+                        <li><strong>max_features:</strong> Number of features to consider for each split</li>
+                        <li><strong>bootstrap:</strong> Whether to sample with replacement</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+            
+            <div class="section">
+                <h2>✅ Advantages of Isolation Forest</h2>
+                <div class="advantages-box highlight-box">
+                    <ul>
+                        <li><strong>Efficiency:</strong> Linear time complexity with low constant factors</li>
+                        <li><strong>Scalability:</strong> Can handle large datasets and high-dimensional data</li>
+                        <li><strong>Minimal Assumptions:</strong> Does not rely on density or distance metrics</li>
+                        <li><strong>Few Parameters:</strong> Relatively straightforward to tune</li>
+                        <li><strong>Robustness:</strong> Works well with noisy data and irrelevant features</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+            
+            <div class="section">
+                <h2>❌ Limitations of Isolation Forest</h2>
+                <div class="limitations-box highlight-box">
+                    <ul>
+                        <li><strong>Binary Features:</strong> May struggle with categorical variables with many categories</li>
+                        <li><strong>Feature Importance:</strong> Doesn't provide clear feature importance for anomalies</li>
+                        <li><strong>Global vs. Local:</strong> May miss local anomalies in complex datasets</li>
+                        <li><strong>Parameter Sensitivity:</strong> Performance can depend on correct parameter selection</li>
+                        <li><strong>Sparse Data:</strong> May not perform optimally with very sparse data</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+            
+            <div class="section">
+                <h2>🚀 When to Use Isolation Forest</h2>
+                <div class="two-column">
+                    <div class="use-case">
+                        <h3>High-Dimensional Data</h3>
+                        <p>Effective for data with many features</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Large Datasets</h3>
+                        <p>Scales well to large volumes of data</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Unknown Anomaly Types</h3>
+                        <p>When you don't know what anomalies look like</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Speed Requirement</h3>
+                        <p>When fast detection is needed</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>Exploratory Analysis</h3>
+                        <p>As an initial anomaly detection method</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gradient-divider"></div>
+            
+            <div class="section">
+                <h2>🔍 Applications</h2>
+                <div class="two-column">
+                    <div class="application-card">
+                        <h3>Fraud Detection</h3>
+                        <p>Identifying fraudulent transactions in financial systems</p>
+                    </div>
+                    <div class="application-card">
+                        <h3>Network Security</h3>
+                        <p>Detecting intrusions and unusual network traffic patterns</p>
+                    </div>
+                    <div class="application-card">
+                        <h3>Manufacturing</h3>
+                        <p>Quality control and defect detection in production lines</p>
+                    </div>
+                    <div class="application-card">
+                        <h3>Healthcare</h3>
+                        <p>Identifying unusual patient conditions or medical fraud</p>
+                    </div>
+                    <div class="application-card">
+                        <h3>IoT Systems</h3>
+                        <p>Detecting sensor anomalies and system failures in connected devices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

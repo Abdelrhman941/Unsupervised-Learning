@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Means Clustering Algorithm Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            margin: 15px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #e65100;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #ff9800;
+        }
+        
+        .section h3 {
+            color: #ef6c00;
+            font-size: 1.4em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box {
+            background: #fff3e0;
+            padding: 20px;
+            border-left: 4px solid #ff9800;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .highlight-box strong {
+            color: #e65100;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .pros-cons-box {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .pros-cons-box h4 {
+            color: #e65100;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .pros-cons-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .pros-cons-box li {
+            margin-bottom: 8px;
+        }
+        
+        .use-case {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+            border-radius: 5px;
+        }
+        
+        .use-case h4 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .math-section {
+            background: linear-gradient(135deg, #57a59f, #5148cc);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 25px;
+            margin: 30px 0;
+            font-size: 2.2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .formula-box {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        
+        .formula {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .algorithm-step {
+            background: #e3f2fd;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+            border-radius: 5px;
+        }
+        
+        .algorithm-step h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        .insight-box {
+            background: #f3e5f5;
+            padding: 15px;
+            border-left: 4px solid #9c27b0;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .tip-box {
+            background: #fff9c4;
+            padding: 15px;
+            border-left: 4px solid #ffb300;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .assumptions-list {
+            background: #fff3e0;
+            padding: 20px;
+            border-left: 4px solid #ff9800;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .assumptions-list h4 {
+            color: #ef6c00;
+            margin-top: 0;
+        }
+        
+        .assumptions-list ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        .assumptions-list li {
+            margin-bottom: 8px;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 K-Means Clustering Algorithm</h1>
+            <p class="subtitle">Partitioning data into K spherical clusters by minimizing within-cluster variance</p>
+        </div>
+        
+        <div class="content">
+            <!-- Introduction Section -->
+            <div class="section">
+                <h2>🔑 What is K-Means Clustering?</h2>
+                <p>K-Means is a <strong>centroid-based clustering algorithm</strong> that partitions data into <strong>K distinct clusters</strong> by grouping similar data points together and separating dissimilar ones. The algorithm works through an iterative process:</p>
+                
+                <ol>
+                    <li><strong>Initialization:</strong> Randomly place K centroids in the feature space</li>
+                    <li><strong>Assignment:</strong> Assign each data point to the nearest centroid</li>
+                    <li><strong>Update:</strong> Move centroids to the center (mean) of assigned points</li>
+                    <li><strong>Iterate:</strong> Repeat assignment and update until convergence</li>
+                </ol>
+                
+                <div class="highlight-box">
+                    <strong>🎯 Core Principle:</strong> K-Means minimizes the <strong>Within-Cluster Sum of Squares (WCSS)</strong> by finding centroids that minimize the total distance between points and their assigned cluster centers.
+                </div>
+            </div>
+            
+            <!-- When to Use Section -->
+            <div class="section">
+                <h2>🚀 When to Use K-Means</h2>
+                
+                <h3>✅ Ideal Scenarios:</h3>
+                <ul>
+                    <li><strong>Spherical clusters:</strong> Data naturally forms round, compact clusters</li>
+                    <li><strong>Known cluster count:</strong> You have domain knowledge about the number of clusters</li>
+                    <li><strong>Large datasets:</strong> Need fast, scalable clustering (O(n⋅k⋅i) complexity)</li>
+                    <li><strong>Similar cluster sizes:</strong> Clusters contain roughly equal numbers of points</li>
+                    <li><strong>Continuous features:</strong> Numerical data where means are meaningful</li>
+                    <li><strong>Customer segmentation:</strong> Market research, user behavior analysis</li>
+                    <li><strong>Image compression:</strong> Color quantization, image segmentation</li>
+                </ul>
+                
+                <h3>❌ Avoid K-Means When:</h3>
+                <ul>
+                    <li><strong>Non-spherical clusters:</strong> Elongated, irregular, or arbitrary shapes</li>
+                    <li><strong>Varying cluster sizes:</strong> Some clusters much larger than others</li>
+                    <li><strong>Different densities:</strong> Clusters with significantly different densities</li>
+                    <li><strong>Outliers present:</strong> Sensitive to extreme values (they skew centroids)</li>
+                    <li><strong>Unknown K:</strong> No idea about the optimal number of clusters</li>
+                    <li><strong>Categorical data:</strong> Non-numerical features where means don't make sense</li>
+                </ul>
+            </div>
+            
+            <!-- Advantages vs Limitations Section -->
+            <div class="section">
+                <h2>⚖️ Advantages vs Limitations</h2>
+                
+                <div class="two-column">
+                    <div class="pros-cons-box">
+                        <h4>✅ Advantages</h4>
+                        <ul>
+                            <li><strong>Computational Efficiency:</strong> Fast, O(n⋅k⋅i) complexity</li>
+                            <li><strong>Simplicity:</strong> Easy to understand and implement</li>
+                            <li><strong>Scalability:</strong> Works well with large datasets</li>
+                            <li><strong>Guaranteed Convergence:</strong> Always converges to local optimum</li>
+                            <li><strong>Memory Efficient:</strong> Only stores centroids</li>
+                        </ul>
+                    </div>
+                    <div class="pros-cons-box">
+                        <h4>❌ Limitations</h4>
+                        <ul>
+                            <li><strong>Requires Pre-specified K:</strong> Must know cluster count</li>
+                            <li><strong>Sensitive to Initialization:</strong> Different starts = different results</li>
+                            <li><strong>Assumes Spherical Clusters:</strong> Struggles with other shapes</li>
+                            <li><strong>Outlier Sensitivity:</strong> Extreme values distort centroids</li>
+                            <li><strong>Equal Size Assumption:</strong> Biased toward similar-sized clusters</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Real-World Use Cases Section -->
+            <div class="section">
+                <h2>🌍 Real-World Use Cases</h2>
+                
+                <div class="use-case">
+                    <h4>🛒 Customer Segmentation</h4>
+                    <p><strong>Scenario:</strong> E-commerce company analyzing customer behavior</p>
+                    <p><strong>Features:</strong> Purchase frequency, average order value, recency</p>
+                    <p><strong>Goal:</strong> Group customers into segments for targeted marketing</p>
+                    <p><strong>Why K-Means:</strong> Large customer base, numerical features, business knows target segments</p>
+                </div>
+                
+                <div class="use-case">
+                    <h4>🎨 Image Compression</h4>
+                    <p><strong>Scenario:</strong> Reducing file size by color quantization</p>
+                    <p><strong>Features:</strong> RGB pixel values</p>
+                    <p><strong>Goal:</strong> Replace similar colors with cluster centroids</p>
+                    <p><strong>Why K-Means:</strong> Fast processing, spherical color clusters in RGB space</p>
+                </div>
+                
+                <div class="use-case">
+                    <h4>📊 Market Research</h4>
+                    <p><strong>Scenario:</strong> Survey data analysis for product positioning</p>
+                    <p><strong>Features:</strong> Likert scale responses, demographic data</p>
+                    <p><strong>Goal:</strong> Identify distinct consumer groups</p>
+                    <p><strong>Why K-Means:</strong> Numerical responses, known market segments from research</p>
+                </div>
+                
+                <div class="use-case">
+                    <h4>🏢 Facility Location</h4>
+                    <p><strong>Scenario:</strong> Optimal placement of distribution centers</p>
+                    <p><strong>Features:</strong> Geographic coordinates (latitude, longitude)</p>
+                    <p><strong>Goal:</strong> Minimize total distance to customers</p>
+                    <p><strong>Why K-Means:</strong> Euclidean distance meaningful, spherical service areas</p>
+                </div>
+            </div>
+            
+            <!-- Key Assumptions Section -->
+            <div class="section">
+                <h2>🔬 Key Assumptions</h2>
+                
+                <div class="assumptions-list">
+                    <h4>🔍 Critical Assumptions to Verify:</h4>
+                    <ol>
+                        <li><strong>Spherical Clusters:</strong> Data forms round, compact groups</li>
+                        <li><strong>Similar Cluster Sizes:</strong> All clusters contain roughly equal points</li>
+                        <li><strong>Similar Variances:</strong> Clusters have comparable spread</li>
+                        <li><strong>Euclidean Distance Meaningful:</strong> Features can be meaningfully averaged</li>
+                        <li><strong>No Hierarchical Structure:</strong> Flat clustering is appropriate</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Mathematical Insight Section -->
+            <div class="math-section">
+                🧮 Mathematical Insight
+            </div>
+            
+            <div class="section">
+                <h3>1. Objective Function (What We Minimize)</h3>
+                <p>K-Means aims to minimize the <strong>Within-Cluster Sum of Squares (WCSS)</strong>:</p>
+                
+                <div class="formula-box">
+                    <div class="formula">J = Σ<sub>i=1</sub><sup>k</sup> Σ<sub>x∈C<sub>i</sub></sub> ||x - μ<sub>i</sub>||²</div>
+                </div>
+                
+                <p><strong>Where:</strong></p>
+                <ul>
+                    <li><strong>J</strong> = Total within-cluster sum of squares</li>
+                    <li><strong>k</strong> = Number of clusters</li>
+                    <li><strong>C<sub>i</sub></strong> = Set of points in cluster <em>i</em></li>
+                    <li><strong>μ<sub>i</sub></strong> = Centroid of cluster <em>i</em></li>
+                    <li><strong>||x - μ<sub>i</sub>||²</strong> = Squared Euclidean distance</li>
+                </ul>
+                
+                <div class="insight-box">
+                    <strong>🎯 Intuition:</strong> We want tight clusters where points are close to their cluster centers. The algorithm finds centroids that minimize the total "tightness" across all clusters.
+                </div>
+                
+                <h3>2. Distance Metric (How We Measure Similarity)</h3>
+                <p><strong>Euclidean Distance</strong> between point <em>x</em> and centroid <em>μ</em>:</p>
+                
+                <div class="formula-box">
+                    <div class="formula">d(x, μ) = √(Σ<sub>j=1</sub><sup>n</sup> (x<sub>j</sub> - μ<sub>j</sub>)²)</div>
+                </div>
+                
+                <p><strong>Squared Euclidean Distance</strong> (used in practice to avoid square root):</p>
+                
+                <div class="formula-box">
+                    <div class="formula">d²(x, μ) = Σ<sub>j=1</sub><sup>n</sup> (x<sub>j</sub> - μ<sub>j</sub>)²</div>
+                </div>
+                
+                <h3>3. Centroid Update Rule</h3>
+                <p>For cluster <em>i</em>, the centroid is the <strong>mean</strong> of all assigned points:</p>
+                
+                <div class="formula-box">
+                    <div class="formula">μ<sub>i</sub> = (1/|C<sub>i</sub>|) Σ<sub>x∈C<sub>i</sub></sub> x</div>
+                </div>
+                
+                <p>Where |C<sub>i</sub>| is the number of points in cluster <em>i</em>.</p>
+                
+                <h3>4. Assignment Rule</h3>
+                <p>Each point <em>x</em> is assigned to the cluster with the nearest centroid:</p>
+                
+                <div class="formula-box">
+                    <div class="formula">c(x) = argmin<sub>i</sub> ||x - μ<sub>i</sub>||²</div>
+                </div>
+            </div>
+            
+            <!-- Convergence & Optimization Section -->
+            <div class="section">
+                <h2>📊 Convergence & Optimization</h2>
+                
+                <h3>Lloyd's Algorithm Properties:</h3>
+                <ul>
+                    <li><strong>Guaranteed Convergence:</strong> Always converges to a local minimum</li>
+                    <li><strong>Monotonic Decrease:</strong> WCSS never increases between iterations</li>
+                    <li><strong>Local Optimum:</strong> May not find global minimum (depends on initialization)</li>
+                </ul>
+                
+                <h3>Initialization Strategies:</h3>
+                <ol>
+                    <li><strong>Random:</strong> Choose random points as initial centroids</li>
+                    <li><strong>K-Means++:</strong> Smart initialization to spread centroids apart</li>
+                    <li><strong>Forgy:</strong> Randomly assign points to clusters, then compute centroids</li>
+                </ol>
+                
+                <div class="tip-box">
+                    <strong>💡 Pro Tip:</strong> K-Means++ initialization typically leads to better results and faster convergence compared to random initialization.
+                </div>
+            </div>
+            
+            <!-- Algorithm Steps Section -->
+            <div class="section">
+                <h2>📊 Algorithm Steps</h2>
+                
+                <p><strong>Input:</strong><br>
+                Dataset X = {x<sub>1</sub>, x<sub>2</sub>, ..., x<sub>n</sub>}<br>
+                Number of clusters <em>k</em></p>
+                
+                <div class="algorithm-step">
+                    <h4>Step 1: Initialize</h4>
+                    <p>Randomly place <em>k</em> centroids:</p>
+                    <div class="formula">{μ<sub>1</sub>, μ<sub>2</sub>, ..., μ<sub>k</sub>}</div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <h4>Step 2: Assign Points to Nearest Centroid</h4>
+                    <p>For each point x<sub>i</sub>, assign it to the nearest centroid:</p>
+                    <div class="formula">c<sub>i</sub> = argmin<sub>j</sub> ||x<sub>i</sub> - μ<sub>j</sub>||²</div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <h4>Step 3: Update Centroids</h4>
+                    <p>Recompute each centroid as the mean of all points assigned to it:</p>
+                    <div class="formula">μ<sub>j</sub> = (1/|C<sub>j</sub>|) Σ<sub>x<sub>i</sub>∈C<sub>j</sub></sub> x<sub>i</sub></div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <h4>Step 4: Check Convergence</h4>
+                    <p>If centroids do not change significantly, stop.<br>
+                    Otherwise, go back to <strong>Step 2</strong> and repeat.</p>
+                </div>
+                
+                <p><strong>Output:</strong><br>
+                Final centroids {μ<sub>1</sub>, ..., μ<sub>k</sub>} and cluster assignments {c<sub>1</sub>, ..., c<sub>n</sub>}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
